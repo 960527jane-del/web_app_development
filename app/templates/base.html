@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}二手書平台{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <!-- TODO: 導覽列 (Logo、搜尋框、登入/註冊或個人頁面連結) -->
+    </header>
+
+    <!-- 用於顯示系統 Flash 訊息 (成功或錯誤提示) -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        {% block content %}
+        <!-- 各頁面主要內容 -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <!-- TODO: 頁尾資訊 -->
+        <p>&copy; 2026 大學生二手書平台</p>
+    </footer>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
