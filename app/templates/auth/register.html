@@ -1,8 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}註冊帳號 - 二手書平台{% endblock %}
+{% block title %}註冊帳號 - CampusBooks{% endblock %}
 
 {% block content %}
-    <h1>註冊帳號</h1>
-    <!-- TODO: 註冊表單 (name, email, password) -->
+<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="col-md-6 col-lg-4">
+        <div class="glass-card text-center">
+            <h2 class="mb-4">註冊新帳號</h2>
+            <form action="{{ url_for('auth.register') }}" method="POST" class="text-start">
+                <div class="mb-3">
+                    <label for="name" class="form-label text-muted-custom small">姓名 / 暱稱</label>
+                    <input type="text" class="form-control" id="name" name="name" required placeholder="王小明">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label text-muted-custom small">Email 信箱</label>
+                    <input type="email" class="form-control" id="email" name="email" required placeholder="name@example.com">
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label text-muted-custom small">密碼</label>
+                    <input type="password" class="form-control" id="password" name="password" required placeholder="請設定一組高強度密碼">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">註冊</button>
+            </form>
+            <div class="mt-4 text-muted-custom small">
+                已經有帳號了？ <a href="{{ url_for('auth.login') }}" class="text-light text-decoration-none border-bottom">立即登入</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

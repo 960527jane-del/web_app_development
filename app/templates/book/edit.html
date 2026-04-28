@@ -1,8 +1,66 @@
 {% extends "base.html" %}
 
-{% block title %}新增/編輯書籍 - 二手書平台{% endblock %}
+{% block title %}
+    {% if book %}編輯書籍{% else %}上架二手書{% endif %} - CampusBooks
+{% endblock %}
 
 {% block content %}
-    <h1>上架二手書</h1>
-    <!-- TODO: 新增與編輯共用的表單 (title, author, course_name, condition, price, image) -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="glass-card">
+            <h2 class="mb-4">{% if book %}編輯書籍資訊{% else %}上架二手書{% endif %}</h2>
+            
+            <form action="{% if book %}{{ url_for('books.update_book', id=book.id) }}{% else %}{{ url_for('books.create_book') }}{% endif %}" method="POST" enctype="multipart/form-data">
+                
+                <div class="mb-3">
+                    <label for="title" class="form-label text-muted-custom small">書名 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="title" name="title" required value="{{ book.title if book else '' }}">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="author" class="form-label text-muted-custom small">作者</label>
+                        <input type="text" class="form-control" id="author" name="author" value="{{ book.author if book else '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="course_name" class="form-label text-muted-custom small">適用課程</label>
+                        <input type="text" class="form-control" id="course_name" name="course_name" value="{{ book.course_name if book else '' }}">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="condition" class="form-label text-muted-custom small">書況 <span class="text-danger">*</span></label>
+                        <select class="form-select" id="condition" name="condition" required>
+                            <option value="">請選擇</option>
+                            <option value="全新" {% if book and book.condition == '全新' %}selected{% endif %}>全新 (無畫線註記)</option>
+                            <option value="近全新" {% if book and book.condition == '近全新' %}selected{% endif %}>近全新 (極少痕跡)</option>
+                            <option value="良好" {% if book and book.condition == '良好' %}selected{% endif %}>良好 (少數畫線註記)</option>
+                            <option value="普通" {% if book and book.condition == '普通' %}selected{% endif %}>普通 (有明顯畫線註記)</option>
+                            <option value="差強人意" {% if book and book.condition == '差強人意' %}selected{% endif %}>差強人意 (外觀破損但堪用)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="price" class="form-label text-muted-custom small">價格 (NTD) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="price" name="price" required min="0" value="{{ book.price if book else '' }}">
+                    </div>
+                </div>
+
+                <!-- 只有新增時允許上傳圖片，編輯時暫不處理圖片更新以求簡單 -->
+                {% if not book %}
+                <div class="mb-4">
+                    <label for="image" class="form-label text-muted-custom small">書籍照片</label>
+                    <input class="form-control" type="file" id="image" name="image" accept="image/png, image/jpeg, image/gif">
+                    <div class="form-text text-muted-custom mt-1">建議上傳真實拍攝的照片，以增加成交率。支援 jpg, png, gif。</div>
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-end gap-2 mt-4 border-top border-secondary pt-4">
+                    <a href="{% if book %}{{ url_for('books.book_detail', id=book.id) }}{% else %}{{ url_for('main.index') }}{% endif %}" class="btn btn-outline-light px-4">取消</a>
+                    <button type="submit" class="btn btn-primary px-5">{% if book %}儲存變更{% else %}確認上架{% endif %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

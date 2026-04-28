@@ -1,8 +1,47 @@
 {% extends "base.html" %}
 
-{% block title %}探索書籍 - 二手書平台{% endblock %}
+{% block title %}探索書籍 - CampusBooks{% endblock %}
 
 {% block content %}
-    <h1>所有書籍 / 搜尋結果</h1>
-    <!-- TODO: 顯示傳入的書籍列表，若為空顯示「查無書籍」 -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        {% if query %}
+            「{{ query }}」的搜尋結果
+        {% else %}
+            所有二手書籍
+        {% endif %}
+    </h2>
+    {% if query %}
+        <a href="{{ url_for('books.list_books') }}" class="btn btn-outline-light btn-sm">清除搜尋</a>
+    {% endif %}
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for book in books %}
+    <div class="col">
+        <div class="glass-card h-100 p-0 text-center text-md-start overflow-hidden text-decoration-none">
+            {% if book.image_path %}
+                <img src="{{ url_for('static', filename=book.image_path) }}" class="book-img-top w-100" alt="{{ book.title }}">
+            {% else %}
+                <div class="book-img-top w-100 d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.05);">
+                    <span class="text-muted">無圖片</span>
+                </div>
+            {% endif %}
+            <div class="p-3">
+                <h5 class="card-title text-truncate mb-1">{{ book.title }}</h5>
+                <p class="text-muted-custom small mb-2">{{ book.course_name or '未指定課程' }}</p>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <span class="fs-5 text-warning fw-bold">${{ book.price }}</span>
+                    <a href="{{ url_for('books.book_detail', id=book.id) }}" class="btn btn-sm btn-outline-light">查看</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <p class="text-muted-custom fs-5">抱歉，目前找不到相關的書籍。</p>
+        <a href="{{ url_for('books.list_books') }}" class="btn btn-outline-light mt-3">查看所有書籍</a>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}

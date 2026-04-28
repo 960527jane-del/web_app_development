@@ -1,13 +1,110 @@
 {% extends "base.html" %}
 
-{% block title %}書籍詳情 - 二手書平台{% endblock %}
+{% block title %}{{ book.title }} - CampusBooks{% endblock %}
 
 {% block content %}
-    <h1>書籍詳情</h1>
-    <!-- TODO: 顯示書名、作者、價格、照片、賣家資訊等 -->
-    
-    <hr>
-    
-    <h2>留言板</h2>
-    <!-- TODO: 顯示該書籍的留言紀錄，與新增留言的表單 -->
+<div class="row g-5">
+    <!-- 左側圖片 -->
+    <div class="col-md-6">
+        <div class="glass-card p-2 text-center">
+            {% if book.image_path %}
+                <img src="{{ url_for('static', filename=book.image_path) }}" class="img-fluid rounded" alt="{{ book.title }}">
+            {% else %}
+                <div class="d-flex align-items-center justify-content-center rounded" style="background: rgba(255,255,255,0.05); min-height: 400px;">
+                    <span class="text-muted">無圖片</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 右側資訊 -->
+    <div class="col-md-6">
+        <div class="glass-card h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h1 class="h2 mb-0">{{ book.title }}</h1>
+                {% if session.get('user_id') %}
+                <form action="{{ url_for('books.toggle_favorite', id=book.id) }}" method="POST" class="m-0 p-0">
+                    <button type="submit" class="btn btn-sm {% if is_favorite %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                        {% if is_favorite %}♥ 取消收藏{% else %}♡ 加入收藏{% endif %}
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            
+            <h2 class="text-warning fw-bold mb-4">${{ book.price }}</h2>
+            
+            <ul class="list-unstyled mb-4">
+                <li class="mb-2"><span class="text-muted-custom">作者：</span> {{ book.author or '未提供' }}</li>
+                <li class="mb-2"><span class="text-muted-custom">適用課程：</span> {{ book.course_name or '未提供' }}</li>
+                <li class="mb-2"><span class="text-muted-custom">書況：</span> {{ book.condition }}</li>
+                <li class="mb-2"><span class="text-muted-custom">賣家：</span> {{ book.seller.name }}</li>
+                <li class="mb-2"><span class="text-muted-custom">狀態：</span> 
+                    {% if book.status == 'available' %}<span class="badge bg-success">上架中</span>
+                    {% elif book.status == 'reserved' %}<span class="badge bg-warning text-dark">保留中</span>
+                    {% else %}<span class="badge bg-secondary">已售出</span>{% endif %}
+                </li>
+            </ul>
+
+            {% if session.get('user_id') == book.seller_id %}
+            <div class="mt-5 border-top border-secondary pt-4">
+                <h5 class="mb-3">賣家管理區塊</h5>
+                <div class="d-flex gap-2 mb-3">
+                    <a href="{{ url_for('books.edit_book', id=book.id) }}" class="btn btn-outline-light btn-sm">編輯書籍資訊</a>
+                </div>
+                <form action="{{ url_for('books.update_book_status', id=book.id) }}" method="POST" class="d-flex gap-2 mb-3 align-items-center">
+                    <select name="status" class="form-select form-select-sm w-auto">
+                        <option value="available" {% if book.status == 'available' %}selected{% endif %}>上架中</option>
+                        <option value="reserved" {% if book.status == 'reserved' %}selected{% endif %}>保留中</option>
+                        <option value="sold" {% if book.status == 'sold' %}selected{% endif %}>已售出</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline-info btn-sm">更新狀態</button>
+                </form>
+                <form action="{{ url_for('books.delete_book', id=book.id) }}" method="POST" onsubmit="return confirm('確定要刪除這本書嗎？');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">下架 / 刪除書籍</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- 留言板 -->
+<div class="mt-5">
+    <div class="glass-card">
+        <h3 class="mb-4">留言板</h3>
+        
+        <!-- 留言列表 -->
+        <div class="mb-4">
+            {% for msg in messages %}
+            <div class="mb-3 p-3 rounded" style="background: rgba(255,255,255,0.05);">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong {% if msg.sender_id == book.seller_id %}class="text-info"{% endif %}>
+                        {{ msg.sender.name }} {% if msg.sender_id == book.seller_id %}(賣家){% endif %}
+                    </strong>
+                    <small class="text-muted-custom">{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                </div>
+                <p class="mb-0">{{ msg.content }}</p>
+            </div>
+            {% else %}
+            <p class="text-muted-custom">目前還沒有留言，來搶頭香吧！</p>
+            {% endfor %}
+        </div>
+
+        <!-- 新增留言表單 -->
+        {% if session.get('user_id') %}
+        <form action="{{ url_for('books.add_message', id=book.id) }}" method="POST">
+            <div class="mb-3">
+                <textarea class="form-control" name="content" rows="3" placeholder="想問賣家什麼問題嗎？" required></textarea>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">送出留言</button>
+            </div>
+        </form>
+        {% else %}
+        <div class="text-center p-3 rounded" style="background: rgba(255,255,255,0.05);">
+            <p class="mb-0">請先 <a href="{{ url_for('auth.login') }}" class="text-info">登入</a> 後再留言。</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

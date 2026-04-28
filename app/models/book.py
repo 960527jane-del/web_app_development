@@ -22,28 +22,83 @@ class Book(db.Model):
 
     @classmethod
     def create(cls, **kwargs):
-        instance = cls(**kwargs)
-        db.session.add(instance)
-        db.session.commit()
-        return instance
+        """
+        新增一筆 Book 記錄。
+        參數: kwargs (包含 title, price, seller_id 等欄位)
+        回傳: 成功時回傳 Book 實例，失敗時拋出例外。
+        """
+        try:
+            instance = cls(**kwargs)
+            db.session.add(instance)
+            db.session.commit()
+            return instance
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error creating Book: {e}")
+            raise
 
     @classmethod
     def get_by_id(cls, book_id):
-        return cls.query.get(book_id)
+        """
+        透過 ID 取得單筆 Book 記錄。
+        參數: book_id (int)
+        回傳: Book 實例 或 None
+        """
+        try:
+            return cls.query.get(book_id)
+        except Exception as e:
+            print(f"Error getting Book by ID: {e}")
+            return None
 
     @classmethod
     def get_all(cls):
-        return cls.query.all()
-        
+        """
+        取得所有 Book 記錄。
+        回傳: Book 實例列表
+        """
+        try:
+            return cls.query.all()
+        except Exception as e:
+            print(f"Error getting all Books: {e}")
+            return []
+            
     @classmethod
     def search(cls, keyword):
-        return cls.query.filter(cls.title.ilike(f'%{keyword}%')).all()
+        """
+        透過書名進行模糊搜尋。
+        參數: keyword (str)
+        回傳: 匹配的 Book 實例列表
+        """
+        try:
+            return cls.query.filter(cls.title.ilike(f'%{keyword}%')).all()
+        except Exception as e:
+            print(f"Error searching Books: {e}")
+            return []
 
     def update(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-        db.session.commit()
+        """
+        更新 Book 記錄。
+        參數: kwargs (包含要更新的欄位與值)
+        回傳: 無
+        """
+        try:
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error updating Book: {e}")
+            raise
 
     def delete(self):
-        db.session.delete(self)
-        db.session.commit()
+        """
+        刪除 Book 記錄。
+        回傳: 無
+        """
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error deleting Book: {e}")
+            raise

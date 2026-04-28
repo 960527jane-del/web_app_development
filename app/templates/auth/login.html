@@ -1,8 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}登入 - 二手書平台{% endblock %}
+{% block title %}登入 - CampusBooks{% endblock %}
 
 {% block content %}
-    <h1>登入</h1>
-    <!-- TODO: 登入表單 (email, password) -->
+<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="col-md-6 col-lg-4">
+        <div class="glass-card text-center">
+            <h2 class="mb-4">會員登入</h2>
+            <form action="{{ url_for('auth.login') }}" method="POST" class="text-start">
+                <div class="mb-3">
+                    <label for="email" class="form-label text-muted-custom small">Email 信箱</label>
+                    <input type="email" class="form-control" id="email" name="email" required placeholder="name@example.com">
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label text-muted-custom small">密碼</label>
+                    <input type="password" class="form-control" id="password" name="password" required placeholder="請輸入密碼">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">登入</button>
+            </form>
+            <div class="mt-4 text-muted-custom small">
+                還沒有帳號？ <a href="{{ url_for('auth.register') }}" class="text-light text-decoration-none border-bottom">立即註冊</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
